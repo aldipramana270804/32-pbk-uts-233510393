@@ -1,62 +1,70 @@
 <template>
-  <div class="app">
-    <h1>Daftar Kegiatan</h1>
+  <div class="outer-wrapper">
+    <div class="container">
+      <h1>📝 Daftar Kegiatan</h1>
 
-    <form @submit.prevent="addTodo" class="form">
-      <input
-        ref="inputRef"
-        v-model="newTodo"
-        type="text"
-        placeholder="Tambah kegiatan..."
-      />
-      <button type="submit">Tambah</button>
-    </form>
+      <form @submit.prevent="addTodo" class="form">
+        <div class="input-wrapper">
+          <input
+            v-model="newTodo"
+            type="text"
+            placeholder="Tambah kegiatanmu di sini..."
+          />
+        </div>
+        <div class="button-wrapper">
+          <button type="submit">➕ Tambah</button>
+        </div>
+      </form>
 
-    <select v-model="filter" class="filter">
-      <option value="all">Semua</option>
-      <option value="pending">Belum Selesai</option>
-      <option value="completed">Selesai</option>
-    </select>
+      <div class="dropdown-filter">
+        <select v-model="filter">
+          <option value="all">📃 Semua</option>
+          <option value="pending">🕒 Belum</option>
+          <option value="completed">✔️ Selesai</option>
+        </select>
+      </div>
 
-    <ul>
-      <li
-        v-for="(todo, index) in filteredTodos"
-        :key="index"
-        :class="{ done: todo.completed }"
-      >
-        <input type="checkbox" v-model="todo.completed" />
-        <span>{{ todo.text }}</span>
-        <button @click="removeTodo(index)">❌</button>
-      </li>
-    </ul>
+      <ul class="todo-grid">
+        <li
+          v-for="(todo, index) in filteredTodos"
+          :key="'todo-' + index"
+          :class="{ done: todo.completed }"
+          class="todo-pill"
+        >
+          <div class="pill-left">
+            <input type="checkbox" v-model="todo.completed" />
+          </div>
+          <div class="pill-content">
+            <span>{{ todo.text }}</span>
+          </div>
+          <button class="delete" @click="removeTodo(index)">🗑️</button>
+        </li>
+      </ul>
+    </div>
+
+    <footer class="footer">
+      <marquee behavior="scroll" direction="left">🌊 @ Aldi Pramana 🌊</marquee>
+    </footer>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed } from "vue";
 
 const newTodo = ref("");
 const filter = ref("all");
-const inputRef = ref(null);
 
 const todos = ref([
-  { text: "Sarapan", completed: false },
-  { text: "Belajar Vue.js", completed: false },
-  { text: "Tidur siang", completed: true },
+  { text: "Sarapan sehat 🍞", completed: false },
+  { text: "Belajar Vue.js 🚀", completed: false },
+  { text: "Tidur siang 😴", completed: true },
 ]);
 
 const addTodo = () => {
   const text = newTodo.value.trim();
-  if (!text) return;
-
-  const exists = todos.value.some(
-    (todo) => todo.text.toLowerCase() === text.toLowerCase()
-  );
-  if (exists) return;
-
+  if (text === "") return;
   todos.value.push({ text, completed: false });
   newTodo.value = "";
-  inputRef.value?.focus();
 };
 
 const removeTodo = (index) => {
@@ -68,120 +76,169 @@ const filteredTodos = computed(() => {
     return todos.value.filter((todo) => !todo.completed);
   } else if (filter.value === "completed") {
     return todos.value.filter((todo) => todo.completed);
+  } else {
+    return todos.value;
   }
-  return todos.value;
 });
 </script>
 
 <style scoped>
-.app {
-  max-width: 480px;
-  margin: 40px auto;
-  padding: 24px;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  font-family: "Inter", sans-serif;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+.outer-wrapper {
+  background: linear-gradient(135deg, #001f3f 0%, #fdf6e3 100%);
+  padding: 40px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", sans-serif;
+  transition: all 0.3s ease;
 }
 
 h1 {
   text-align: center;
-  color: #333;
-  font-weight: 600;
+  color: #001f3f;
   margin-bottom: 24px;
-  font-size: 24px;
+  font-size: 40px;
+  font-weight: bold;
 }
 
 .form {
   display: flex;
-  gap: 8px;
+  gap: 16px;
   margin-bottom: 16px;
 }
 
-input[type="text"] {
+.input-wrapper {
   flex: 1;
-  padding: 10px 12px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: white;
-  transition: border-color 0.2s;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: 2px solid #001f3f;
+  border-radius: 12px;
+  background: #ffffff;
+  outline: none;
+  height: 48px;
+  box-sizing: border-box;
 }
 
 input[type="text"]:focus {
-  outline: none;
-  border-color: #999;
+  border-color: #003366;
+  background-color: #fefae0;
+}
+
+.button-wrapper {
+  flex-shrink: 0;
 }
 
 button {
-  padding: 10px 16px;
-  background-color: #4a90e2;
+  background: #001f3f;
   color: white;
-  font-size: 14px;
+  font-weight: bold;
   border: none;
-  border-radius: 8px;
+  padding: 0 24px;
+  height: 48px;
+  font-size: 16px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
 }
 
 button:hover {
-  background-color: #357ab8;
+  background-color: #003366;
 }
 
-.filter {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background-color: white;
+.dropdown-filter {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-start;
 }
 
-ul {
-  list-style: none;
+select {
+  padding: 10px 14px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 2px solid #001f3f;
+  background-color: #fdf6e3;
+  color: #001f3f;
+  outline: none;
+}
+
+.todo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
   padding: 0;
-  margin: 0;
+  margin-top: 16px;
 }
 
-li {
+.todo-pill {
   display: flex;
   align-items: center;
-  padding: 12px;
-  border-bottom: 1px solid #eaeaea;
-  transition: background-color 0.2s;
+  padding: 14px 20px;
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid #eee;
 }
 
-li:hover {
-  background-color: #f5f5f5;
+.todo-pill:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
-li.done span {
-  text-decoration: line-through;
-  color: #999;
+.pill-left {
+  margin-right: 14px;
 }
 
-li span {
+.pill-content {
   flex: 1;
-  margin-left: 10px;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #001f3f;
 }
 
-li input[type="checkbox"] {
+.todo-pill.done {
+  background: #fefae0;
+  border: 1px solid #ccc;
+}
+
+.todo-pill.done span {
+  text-decoration: line-through;
+  color: #777;
+}
+
+.delete {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  transition: 0.2s ease;
+  color: #ff6b6b;
+}
+
+.delete:hover {
   transform: scale(1.2);
 }
 
-li button {
-  background: none;
-  border: none;
-  color: #e57373;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 4px;
-}
-
-li button:hover {
-  color: #c62828;
+.footer {
+  margin-top: 30px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: #020e53;
+  padding: 12px;
 }
 </style>
